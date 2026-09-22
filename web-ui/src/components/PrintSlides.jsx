@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { markdownTableComponents } from './MarkdownTable';
-import { markdownRehypePlugins } from '../markdownPlugins';
+import { markdownRehypePlugins, markdownUrlTransform } from '../markdownPlugins';
 import './PrintSlides.css';
 
 /**
@@ -49,7 +49,7 @@ function PrintSlides({ doc, onReady }) {
         <div key={i} className="print-slide">
           {section.title && (
             <div className="print-slide-title">
-              <ReactMarkdown rehypePlugins={markdownRehypePlugins}>
+              <ReactMarkdown rehypePlugins={markdownRehypePlugins} urlTransform={markdownUrlTransform}>
                 {section.title}
               </ReactMarkdown>
             </div>
@@ -58,7 +58,7 @@ function PrintSlides({ doc, onReady }) {
             {section.contents.map((content, j) => {
               if (content.kind === 'TEXT') {
                 return (
-                  <ReactMarkdown key={j} remarkPlugins={[remarkGfm]} rehypePlugins={markdownRehypePlugins} components={markdownTableComponents}>{content.text}</ReactMarkdown>
+                  <ReactMarkdown key={j} remarkPlugins={[remarkGfm]} rehypePlugins={markdownRehypePlugins} urlTransform={markdownUrlTransform} components={markdownTableComponents}>{content.text}</ReactMarkdown>
                 );
               }
               if (content.kind === 'CODE') {

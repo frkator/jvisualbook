@@ -9,6 +9,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-markdown": "^10.1.0",
+    "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
@@ -24,6 +25,7 @@
     "prebuild": "npm run copy-monaco",
     "build": "vite build",
     "clean": "node scripts/clean.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "node --test src/markdownPlugins.test.js"
   }
 }

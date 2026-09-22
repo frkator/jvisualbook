@@ -4,12 +4,13 @@ import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { markdownRehypePlugins } from './markdownPlugins.js';
+import { markdownRehypePlugins, markdownUrlTransform } from './markdownPlugins.js';
 
 function render(markdown) {
   return renderToStaticMarkup(createElement(ReactMarkdown, {
     remarkPlugins: [remarkGfm],
     rehypePlugins: markdownRehypePlugins,
+    urlTransform: markdownUrlTransform,
   }, markdown));
 }
 
@@ -46,6 +47,41 @@ test('links have no special color-marker behavior', () => {
   assert.match(html, /<a href="#external">Fragment<\/a>/);
   assert.match(html, /<a href="https:\/\/example.com" title="External to framework">Source<\/a>/);
   assert.doesNotMatch(html, /style=|<span\b|external-capability/);
+});
+
+test('base64 GIFs retain their source in Markdown and raw HTML', () => {
+  const url = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+  for (const markdown of [`![Magic](${url})`, `<img src="${url}" alt="Magic">`]) {
+    const html = render(markdown);
+    assert.ok(html.includes(`src="${url}"`));
+    assert.ok(html.includes('alt="Magic"'));
+  }
+});
+
+test('relative and web image URLs retain the default behavior', () => {
+  for (const url of ['/images/magic.gif', 'https://example.com/magic.gif']) {
+    assert.ok(render(`![Magic](${url})`).includes(`src="${url}"`));
+  }
+});
+
+test('base64 image data is allowed only as an image source', () => {
+  const url = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+  assert.doesNotMatch(render(`[Download](${url})`), /href="data:/);
+  assert.doesNotMatch(render(`<a href="${url}">Download</a>`), /href="data:/);
+  assert.equal(markdownUrlTransform(url, 'src', { tagName: 'iframe' }), '');
+  assert.equal(markdownUrlTransform(url, 'href', { tagName: 'img' }), '');
+});
+
+test('non-raster data and JavaScript sources keep the default rejection', () => {
+  for (const url of [
+    'data:text/html;base64,PHNjcmlwdD4=',
+    'data:image/svg+xml;base64,PHN2Zz4=',
+    'data:image/gif,not-base64',
+    'data:image/gif;base64,invalid!',
+    'javascript:alert(1)',
+  ]) {
+    assert.equal(markdownUrlTransform(url, 'src', { tagName: 'img' }), '', url);
+  }
 });
 
 test('Markdown headings, code, emphasis and GFM task lists survive', () => {

@@ -6,7 +6,7 @@ import MonacoEditorWrapper from './MonacoEditor';
 import SlideViewer from './SlideViewer';
 import { printSlidesAsPDF } from './PrintSlides';
 import { markdownTableComponents } from './MarkdownTable';
-import { markdownRehypePlugins } from '../markdownPlugins';
+import { markdownRehypePlugins, markdownUrlTransform } from '../markdownPlugins';
 import './DocumentViewer.css';
 
 function assignUUID(doc) {
@@ -122,7 +122,7 @@ function DocumentViewer({ chapterName }) {
     if (content.kind === "TEXT") {
       return (
         <div key={content.id} className="text-content">
-          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={markdownRehypePlugins} components={markdownTableComponents}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={markdownRehypePlugins} urlTransform={markdownUrlTransform} components={markdownTableComponents}>
             {content.text}
           </ReactMarkdown>
         </div>
@@ -235,7 +235,7 @@ function DocumentViewer({ chapterName }) {
         {docToRender.sections.map((section, sectionIndex) => (
           <div key={sectionIndex} className="section">
             <div className="section-title">
-              <ReactMarkdown rehypePlugins={markdownRehypePlugins}>
+              <ReactMarkdown rehypePlugins={markdownRehypePlugins} urlTransform={markdownUrlTransform}>
                 {section.title}
               </ReactMarkdown>
             </div>
