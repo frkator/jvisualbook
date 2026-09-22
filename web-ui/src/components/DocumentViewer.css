@@ -126,15 +126,12 @@
 
     .document-viewer {
         page: document-viewer-page;
+        box-shadow: none;
     }
 
     .document-toolbar,
     .editor-resize-handle {
         display: none !important;
-    }
-
-    .document-viewer {
-        box-shadow: none;
     }
 
     .document-content {
@@ -148,6 +145,10 @@
         padding-top: 1rem;
         margin: 1rem;
         border-bottom: none;
+    }
+
+    img {
+        width: 90%;
     }
 
     .monaco-editor-wrapper {
