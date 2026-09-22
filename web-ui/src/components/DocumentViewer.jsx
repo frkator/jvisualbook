@@ -5,6 +5,8 @@ import { fetchChapterDocument, postCode } from '../services/api';
 import MonacoEditorWrapper from './MonacoEditor';
 import SlideViewer from './SlideViewer';
 import { printSlidesAsPDF } from './PrintSlides';
+import { markdownTableComponents } from './MarkdownTable';
+import { markdownRehypePlugins } from '../markdownPlugins';
 import './DocumentViewer.css';
 
 function assignUUID(doc) {
@@ -58,6 +60,7 @@ function DocumentViewer({ chapterName }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [slideMode, setSlideMode] = useState(false);
+  const [executing, setExecuting] = useState(false);
   const codeAbortController = useRef(null);
   const exitSlideMode = useCallback(() => setSlideMode(false), []);
 
@@ -80,6 +83,7 @@ function DocumentViewer({ chapterName }) {
     codeAbortController.current?.abort();
     const controller = new AbortController();
     codeAbortController.current = controller;
+    setExecuting(true);
 
     const codeBlocks = getCodeBlocks(doc);
     const program = {
@@ -92,6 +96,12 @@ function DocumentViewer({ chapterName }) {
       if (err.name === 'AbortError') return;  // postCode() is aborted
       setError('Failed to run document');
       console.error(err);
+    } finally {
+      // An older request must not clear a newer request's busy indicator.
+      if (codeAbortController.current === controller) {
+        codeAbortController.current = null;
+        setExecuting(false);
+      }
     }
   };
 
@@ -111,9 +121,11 @@ function DocumentViewer({ chapterName }) {
   const renderContent = content => {
     if (content.kind === "TEXT") {
       return (
-        <ReactMarkdown key={content.id} className="text-content" remarkPlugins={[remarkGfm]}>
-          {content.text}
-        </ReactMarkdown>
+        <div key={content.id} className="text-content">
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={markdownRehypePlugins} components={markdownTableComponents}>
+            {content.text}
+          </ReactMarkdown>
+        </div>
       );
     }
     if (content.kind === "CODE") {
@@ -181,18 +193,29 @@ function DocumentViewer({ chapterName }) {
     return <div className="error-container">No document found</div>;
   }
 
+  const executionIndicator = executing ? (
+    <div className="execution-indicator" role="status">
+      <span>Evaluating Java...</span>
+      <progress aria-label="Waiting for Java evaluation" />
+    </div>
+  ) : null;
+
   if (slideMode) {
     return (
-      <SlideViewer
-        doc={docToRender}
-        onExit={exitSlideMode}
-        renderContent={renderContent}
-      />
+      <>
+        {executionIndicator}
+        <SlideViewer
+          doc={docToRender}
+          onExit={exitSlideMode}
+          renderContent={renderContent}
+        />
+      </>
     );
   }
 
   return (
     <div className="document-viewer">
+      {executionIndicator}
       <div className="document-toolbar">
         <h2 className="chapter-title">Chapter: {chapterName}</h2>
         <div className="toolbar-actions">
@@ -211,9 +234,11 @@ function DocumentViewer({ chapterName }) {
       <div className="document-content">
         {docToRender.sections.map((section, sectionIndex) => (
           <div key={sectionIndex} className="section">
-            <ReactMarkdown className="section-title">
-              {section.title}
-            </ReactMarkdown>
+            <div className="section-title">
+              <ReactMarkdown rehypePlugins={markdownRehypePlugins}>
+                {section.title}
+              </ReactMarkdown>
+            </div>
             <br/>
             <div className="section-contents">
               {section.contents.map(content =>

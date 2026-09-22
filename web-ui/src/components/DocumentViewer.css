@@ -10,6 +10,22 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+.execution-indicator {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid currentColor;
+    border-radius: 0.4rem;
+    pointer-events: none;
+}
+
 .document-toolbar {
     display: flex;
     justify-content: space-between;
@@ -61,6 +77,11 @@
     font-weight: 600;
 }
 
+.section-title > :is(h1, h2, h3, h4, h5, h6, p) {
+    font-size: inherit;
+    margin: 0;
+}
+
 .section-contents {
     padding-left: 1rem;
     display: flex;
@@ -99,6 +120,10 @@
 }
 
 @media print {
+    .execution-indicator {
+        display: none !important;
+    }
+
     .document-viewer {
         page: document-viewer-page;
     }

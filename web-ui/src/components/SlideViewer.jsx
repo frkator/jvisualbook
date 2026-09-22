@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { markdownRehypePlugins } from '../markdownPlugins';
 import './SlideViewer.css';
 
 function SlideViewer({ doc, onExit, renderContent }) {
@@ -43,7 +44,9 @@ function SlideViewer({ doc, onExit, renderContent }) {
         <div className="slide-card">
           <div key={idx} className="slide-fade">   {/* ← key drives the animation */}
             {section.title && (
-              <ReactMarkdown className="slide-title">{section.title}</ReactMarkdown>
+              <div className="slide-title">
+                <ReactMarkdown rehypePlugins={markdownRehypePlugins}>{section.title}</ReactMarkdown>
+              </div>
             )}
             <div className="slide-body">
               {section.contents.map(c => renderContent(c))}

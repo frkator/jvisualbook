@@ -1,0 +1,36 @@
+.markdown-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    line-height: 1.2;
+}
+
+.markdown-table th,
+.markdown-table td {
+    padding: 0 8px;
+    vertical-align: top;
+    border-bottom: 1px solid #d8dfe3;
+}
+
+.markdown-table th {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background: #edf1f3;
+    color: #202a31;
+    font-weight: 700;
+    border-bottom: 2px solid #627681;
+}
+
+.markdown-table th:first-child,
+.markdown-table td:first-child {
+    width: 23%;
+    font-weight: 700;
+}
+
+.slide-card:has(.markdown-table) {
+    padding: 1.5rem 2rem;
+}
+
+.markdown-table code {
+    overflow-wrap: anywhere;
+}

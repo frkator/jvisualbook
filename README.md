@@ -81,6 +81,15 @@ Text lines begin with `// ` and are rendered as Markdown:
 // - Bullet two
 ```
 
+Comments also support ordinary HTML, including inline styles:
+
+```java
+// <span style="color: red">External tooling</span>
+```
+
+HTML is rendered consistently in document, slide and print views. Only open
+trusted chapters: their HTML is trusted just like their executable Java code.
+
 ### Code
 
 Non-comment, non-blank lines are treated as Java code and executed by JShell:
@@ -149,4 +158,3 @@ It builds a JAR file with the name `jvisualbook-<version>.jar` in the `target` d
 
 Then you can run `java -jar target/jvisualbook-*.jar` to start the web UI,
 and connect to it at the following default URL: `http://localhost:8080`.
-

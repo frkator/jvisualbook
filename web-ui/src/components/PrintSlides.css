@@ -43,6 +43,11 @@
         flex-shrink: 0;
     }
 
+    .print-slide-title > :is(h1, h2, h3, h4, h5, h6, p) {
+        font-size: inherit;
+        margin: 0;
+    }
+
     .print-slide-body {
         flex: 1;
         display: flex;

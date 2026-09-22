@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { markdownTableComponents } from './MarkdownTable';
+import { markdownRehypePlugins } from '../markdownPlugins';
 import './PrintSlides.css';
 
 /**
@@ -45,15 +48,17 @@ function PrintSlides({ doc, onReady }) {
       {doc.sections.map((section, i) => (
         <div key={i} className="print-slide">
           {section.title && (
-            <ReactMarkdown className="print-slide-title">
-              {section.title}
-            </ReactMarkdown>
+            <div className="print-slide-title">
+              <ReactMarkdown rehypePlugins={markdownRehypePlugins}>
+                {section.title}
+              </ReactMarkdown>
+            </div>
           )}
           <div className="print-slide-body">
             {section.contents.map((content, j) => {
               if (content.kind === 'TEXT') {
                 return (
-                  <ReactMarkdown key={j}>{content.text}</ReactMarkdown>
+                  <ReactMarkdown key={j} remarkPlugins={[remarkGfm]} rehypePlugins={markdownRehypePlugins} components={markdownTableComponents}>{content.text}</ReactMarkdown>
                 );
               }
               if (content.kind === 'CODE') {
